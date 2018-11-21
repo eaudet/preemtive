@@ -1,0 +1,55 @@
+<html>
+<head>
+  <title>Chat WebSocket</title>
+  <script src="./js/sockjs-0.3.4.js"></script>
+  <script src="./js/stomp.js"></script>
+  <script type="text/javascript">
+
+    var stompClient = null;
+
+    function connect() {
+      var socket = new SockJS('http://localhost:8080/socket');
+      stompClient = Stomp.over(socket);
+
+      stompClient.subscribe("/chat", function (message) {
+        alert("Message " + message.body);
+      });
+    }
+
+    function sendMessage() {
+      var from = document.getElementById('from').value;
+      var text = document.getElementById('text').value;
+      stompClient.send("/app/send/message", {}, text);
+    }
+
+    function disconnect() {
+      if (stompClient != null) {
+        stompClient.close();
+      }
+      console.log("Disconnected");
+    }
+
+  </script>
+</head>
+<body>
+<div>
+  <div>
+    <input type="text" id="from" placeholder="Choose a nickname"/>
+  </div>
+  <br/>
+  <div>
+    <button id="connect" onclick="connect();">Connect</button>
+    <button id="disconnect" disabled="disabled" onclick="disconnect();">
+      Disconnect
+    </button>
+  </div>
+  <br/>
+  <div id="conversationDiv">
+    <input type="text" id="text" placeholder="Write a message..."/>
+    <button id="sendMessage" onclick="sendMessage();">Send</button>
+    <p id="response"></p>
+  </div>
+</div>
+
+</body>
+</html>
